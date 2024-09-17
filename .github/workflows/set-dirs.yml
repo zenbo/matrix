@@ -1,0 +1,34 @@
+name: Set dirs
+
+on:
+  workflow_call:
+    outputs:
+      dirs:
+        description: Directories to be processed
+        value: ${{ jobs.setdirs.outputs.dirs }}
+      has_dirs:
+        description: Whether directories are specified
+        value: ${{ jobs.setdirs.outputs.has_dirs }}
+
+jobs:
+  setdirs:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.set-dirs.outputs.dirs }}
+      has_dirs: ${{ steps.set-dirs.outputs.has_dirs }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - run: ls -lia .github/workflows
+      - name: Set dirs
+        id: set-dirs
+        run: |
+          dirs=$(grep -v '^#' .github/workflows/dirs.txt | grep -v '^$' || true)
+          if [ -z "$dirs" ]; then
+            echo "has_dirs=false" >> "$GITHUB_OUTPUT"
+            echo "dirs=[]" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_dirs=true" >> "$GITHUB_OUTPUT"
+            dirs=$(echo "$dirs" | jq -R -s -c 'split("\n")[:-1]')
+            echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
+          fi
