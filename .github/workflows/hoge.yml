@@ -3,16 +3,26 @@ on:
   workflow_dispatch:
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.set-dirs.outputs.dirs }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set dirs
+        id: set-dirs
+        run: |
+          echo "dirs=$(grep -v '^#' .github/workflows/dir.txt | grep -v '^$' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   fuga:
     name: Fuga
+    needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
-        dir:
-          - dir1
-          - dir2
+        dir: ${{fromJson(needs.setup.outputs.dirs)}}
     steps:
       - name: Run
         run: |

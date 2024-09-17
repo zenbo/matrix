@@ -1,0 +1,4 @@
+path/to/hoge
+
+path/to/fuga
+#path/to/piyo <= ignore
