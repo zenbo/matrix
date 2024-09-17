@@ -1,0 +1,19 @@
+name: Hoge
+on:
+  workflow_dispatch:
+
+jobs:
+  fuga:
+    name: Fuga
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        dir:
+          - dir1
+          - dir2
+    steps:
+      - name: Run
+        run: |
+          echo ${{ matrix.dir }}
